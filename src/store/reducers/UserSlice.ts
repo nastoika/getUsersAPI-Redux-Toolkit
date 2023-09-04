@@ -1,28 +1,39 @@
 import {IUser} from "../../models/IUser";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {fetchUsers} from "./ActionCreators";
 
 interface UserState {
     users: IUser[],
     isLoading: boolean,
     error: string,
-    count: number,
 }
 
 const initialState = {
     users: [],
     isLoading: false,
     error: '',
-    count: 0,
 }
 
 export const userSlice = createSlice({
     name: 'user',
     initialState,
     //аналогично switch case
-    reducers : {
-        increment(state, action : PayloadAction<number>) {
-            state.count += action.payload;
+    reducers: {},
+    extraReducers: {
+        [fetchUsers.fulfilled.type]: (state, action: PayloadAction<IUser[]>) => {
+            state.isLoading = false;
+            state.error = '';
+            // @ts-ignore
+            state.users = action.payload;
+        },
+        [fetchUsers.pending.type]: (state) => {
+            state.isLoading = true;
+        },
+        [fetchUsers.rejected.type]: (state, action: PayloadAction<string>) => {
+            state.isLoading = false;
+            state.error = action.payload;
         }
+
     }
 })
 
